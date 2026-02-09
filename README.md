@@ -1,0 +1,2 @@
+# kuzuela-app
+about:blank
