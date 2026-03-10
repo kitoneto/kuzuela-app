@@ -31,44 +31,36 @@ export class UserLanguageProgressRepository {
   }
 
   async updateProgress(userId: string, lang: LanguageCode, progress: Partial<UserLanguageProgress>): Promise<void> {
-    try {
-      const dbData: Record<string, unknown> = {};
-      if (progress.totalLessonsCompleted !== undefined) dbData.total_lessons_completed = progress.totalLessonsCompleted;
-      if (progress.totalXP !== undefined) dbData.total_xp = progress.totalXP;
-      if (progress.currentLevel !== undefined) dbData.current_level = progress.currentLevel;
-      if (progress.streakDays !== undefined) dbData.streak_days = progress.streakDays;
-      if (progress.bestStreakDays !== undefined) dbData.best_streak_days = progress.bestStreakDays;
-      if (progress.lastActivityAt !== undefined) dbData.last_activity_at = progress.lastActivityAt;
+    const dbData: Record<string, unknown> = {};
+    if (progress.totalLessonsCompleted !== undefined) dbData.total_lessons_completed = progress.totalLessonsCompleted;
+    if (progress.totalXP !== undefined) dbData.total_xp = progress.totalXP;
+    if (progress.currentLevel !== undefined) dbData.current_level = progress.currentLevel;
+    if (progress.streakDays !== undefined) dbData.streak_days = progress.streakDays;
+    if (progress.bestStreakDays !== undefined) dbData.best_streak_days = progress.bestStreakDays;
+    if (progress.lastActivityAt !== undefined) dbData.last_activity_at = progress.lastActivityAt;
 
-      const { error } = await supabase
-        .from('user_language_progress')
-        .upsert({ user_id: userId, language_code: lang, ...dbData }, { onConflict: 'user_id,language_code' });
+    const { error } = await supabase
+      .from('user_language_progress')
+      .upsert({ user_id: userId, language_code: lang, ...dbData }, { onConflict: 'user_id,language_code' });
 
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      throw err;
-    }
+    if (error) throw new Error(error.message);
   }
 
   async initializeProgress(userId: string, lang: LanguageCode): Promise<void> {
-    try {
-      const { error } = await supabase.from('user_language_progress').upsert(
-        {
-          user_id: userId,
-          language_code: lang,
-          total_lessons_completed: 0,
-          total_xp: 0,
-          current_level: 'A1',
-          streak_days: 0,
-          best_streak_days: 0,
-          last_activity_at: null,
-        },
-        { onConflict: 'user_id,language_code' }
-      );
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase.from('user_language_progress').upsert(
+      {
+        user_id: userId,
+        language_code: lang,
+        total_lessons_completed: 0,
+        total_xp: 0,
+        current_level: 'A1',
+        streak_days: 0,
+        best_streak_days: 0,
+        last_activity_at: null,
+      },
+      { onConflict: 'user_id,language_code' }
+    );
+    if (error) throw new Error(error.message);
   }
 
   private mapRow(row: Record<string, unknown>): UserLanguageProgress {

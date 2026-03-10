@@ -6,17 +6,17 @@ const repo = new UserLanguageProgressRepository();
 
 export function useLanguageProgress(userId?: string) {
   const [progress, setProgress] = useState<UserLanguageProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!userId);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
-    setIsLoading(true);
+    let active = true;
     repo
       .getAllProgress(userId)
-      .then(setProgress)
-      .catch(e => setError((e as Error).message))
-      .finally(() => setIsLoading(false));
+      .then(data => { if (active) { setProgress(data); setIsLoading(false); } })
+      .catch(e => { if (active) { setError((e as Error).message); setIsLoading(false); } });
+    return () => { active = false; };
   }, [userId]);
 
   const getProgressForLanguage = useCallback(

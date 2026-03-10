@@ -38,26 +38,31 @@ export function LanguageContextProvider({
   const [learningLanguages, setLearningLanguages] = useState<UserLearningLanguage[]>([]);
   const [languageProgress, setLanguageProgress] = useState<Partial<Record<LanguageCode, UserLanguageProgress>>>({});
   const [currentLearningLanguage, setCurrentLearningLanguage] = useState<LanguageCode>('en');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!userId);
 
   useEffect(() => {
     if (!userId) return;
 
-    setIsLoading(true);
+    let active = true;
     Promise.all([
       prefsRepo.getUserPreferences(userId),
       prefsRepo.getUserLearningLanguages(userId),
       progressRepo.getAllProgress(userId),
     ])
       .then(([prefs, langs, allProgress]) => {
+        if (!active) return;
         setUserPreferences(prefs);
         setLearningLanguages(langs);
         if (prefs?.learningLanguage) setCurrentLearningLanguage(prefs.learningLanguage);
         const progressMap: Partial<Record<LanguageCode, UserLanguageProgress>> = {};
         for (const p of allProgress) progressMap[p.languageCode] = p;
         setLanguageProgress(progressMap);
+        setIsLoading(false);
       })
-      .finally(() => setIsLoading(false));
+      .catch(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => { active = false; };
   }, [userId]);
 
   const updatePreferences = useCallback(

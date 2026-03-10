@@ -22,21 +22,17 @@ export class UserLanguagePreferencesRepository {
   }
 
   async updateUserPreferences(userId: string, prefs: Partial<UserLanguagePreferences>): Promise<void> {
-    try {
-      const dbPrefs: Record<string, string> = {};
-      if (prefs.nativeLanguage) dbPrefs.native_language = prefs.nativeLanguage;
-      if (prefs.learningLanguage) dbPrefs.learning_language = prefs.learningLanguage;
-      if (prefs.interfaceLanguage) dbPrefs.interface_language = prefs.interfaceLanguage;
-      if (prefs.explanationLanguage) dbPrefs.explanation_language = prefs.explanationLanguage;
+    const dbPrefs: Record<string, string> = {};
+    if (prefs.nativeLanguage) dbPrefs.native_language = prefs.nativeLanguage;
+    if (prefs.learningLanguage) dbPrefs.learning_language = prefs.learningLanguage;
+    if (prefs.interfaceLanguage) dbPrefs.interface_language = prefs.interfaceLanguage;
+    if (prefs.explanationLanguage) dbPrefs.explanation_language = prefs.explanationLanguage;
 
-      const { error } = await supabase
-        .from('user_language_preferences')
-        .upsert({ user_id: userId, ...dbPrefs }, { onConflict: 'user_id' });
+    const { error } = await supabase
+      .from('user_language_preferences')
+      .upsert({ user_id: userId, ...dbPrefs }, { onConflict: 'user_id' });
 
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      throw err;
-    }
+    if (error) throw new Error(error.message);
   }
 
   async getUserLearningLanguages(userId: string): Promise<UserLearningLanguage[]> {
@@ -61,35 +57,27 @@ export class UserLanguagePreferencesRepository {
   }
 
   async addLearningLanguage(userId: string, lang: LanguageCode, level: ProficiencyCode = 'A1'): Promise<void> {
-    try {
-      const { error } = await supabase.from('user_learning_languages').upsert(
-        {
-          user_id: userId,
-          language_code: lang,
-          proficiency_level: level,
-          started_at: new Date().toISOString(),
-          last_studied_at: null,
-          total_xp: 0,
-          streak_days: 0,
-        },
-        { onConflict: 'user_id,language_code' }
-      );
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase.from('user_learning_languages').upsert(
+      {
+        user_id: userId,
+        language_code: lang,
+        proficiency_level: level,
+        started_at: new Date().toISOString(),
+        last_studied_at: null,
+        total_xp: 0,
+        streak_days: 0,
+      },
+      { onConflict: 'user_id,language_code' }
+    );
+    if (error) throw new Error(error.message);
   }
 
   async removeLearningLanguage(userId: string, lang: LanguageCode): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('user_learning_languages')
-        .delete()
-        .eq('user_id', userId)
-        .eq('language_code', lang);
-      if (error) throw new Error(error.message);
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase
+      .from('user_learning_languages')
+      .delete()
+      .eq('user_id', userId)
+      .eq('language_code', lang);
+    if (error) throw new Error(error.message);
   }
 }

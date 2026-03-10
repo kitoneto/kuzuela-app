@@ -6,17 +6,17 @@ const repo = new UserLanguagePreferencesRepository();
 
 export function useLanguagePreferences(userId?: string) {
   const [preferences, setPreferences] = useState<UserLanguagePreferences | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!userId);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
-    setIsLoading(true);
+    let active = true;
     repo
       .getUserPreferences(userId)
-      .then(setPreferences)
-      .catch(e => setError((e as Error).message))
-      .finally(() => setIsLoading(false));
+      .then(data => { if (active) { setPreferences(data); setIsLoading(false); } })
+      .catch(e => { if (active) { setError((e as Error).message); setIsLoading(false); } });
+    return () => { active = false; };
   }, [userId]);
 
   const updatePreferences = useCallback(
