@@ -1,0 +1,27 @@
+export const APP_NAME = 'Kuzuela';
+
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+  AUTH_CALLBACK: '/auth/callback',
+  ONBOARDING: '/onboarding',
+  DASHBOARD: '/dashboard',
+  COURSES: '/courses',
+  COURSE_DETAIL: (id: string) => `/courses/${id}`,
+  LESSON: (courseId: string, lessonId: string) => `/courses/${courseId}/lessons/${lessonId}`,
+  LESSON_ACTIVE: (courseId: string, lessonId: string) => `/courses/${courseId}/lessons/${lessonId}/active`,
+  TUTOR: '/tutor',
+  LEADERBOARD: '/leaderboard',
+  ACHIEVEMENTS: '/achievements',
+  PROGRESS: '/progress',
+  PREMIUM: '/premium',
+  PROFILE: '/profile',
+  SETTINGS: '/settings',
+  ADMIN: '/admin',
+  ADMIN_COURSES: '/admin/courses',
+  ADMIN_USERS: '/admin/users',
+  NOT_FOUND: '*',
+};
